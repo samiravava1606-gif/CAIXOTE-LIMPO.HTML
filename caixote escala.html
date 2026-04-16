@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist da Casa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 10px; }
+    h1 { text-align: center; font-size: 1.5em; }
+    .tarefa {
+      background: #fff;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+    }
+    .linha { display: flex; justify-content: space-between; align-items: center; }
+    .tarefa input[type="text"] {
+      margin-top: 5px; padding: 6px; width: 100%; box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px; padding: 12px; width: 100%;
+      font-size: 1em; background: #007bff; color: white;
+      border: none; border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Checklist da Casa</h1>
+  <div id="lista"></div>
+  <button onclick="resetar()">Resetar Semana</button>
+
+  <script>
+    const comodos = [
+      "Banheiro 1","Banheiro 2","Sala","Escada","Copa",
+      "Quartinho","Cozinha","Camarote","Mesona","Lavanderia"
+    ];
+
+    const lista = document.getElementById("lista");
+    const dadosSalvos = JSON.parse(localStorage.getItem("tarefas")) || {};
+
+    comodos.forEach(comodo => {
+      const div = document.createElement("div");
+      div.className = "tarefa";
+
+      const linha = document.createElement("div");
+      linha.className = "linha";
+
+      const label = document.createElement("label");
+      label.textContent = comodo;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = dadosSalvos[comodo]?.feito || false;
+
+      const inputNome = document.createElement("input");
+      inputNome.type = "text";
+      inputNome.placeholder = "Nome da moradora";
+      inputNome.value = dadosSalvos[comodo]?.nome || "";
+
+      checkbox.addEventListener("change", () => salvar(comodo, checkbox.checked, inputNome.value));
+      inputNome.addEventListener("input", () => salvar(comodo, checkbox.checked, inputNome.value));
+
+      linha.appendChild(label);
+      linha.appendChild(checkbox);
+      div.appendChild(linha);
+      div.appendChild(inputNome);
+      lista.appendChild(div);
+    });
+
+    function salvar(comodo, feito, nome) {
+      dadosSalvos[comodo] = { feito, nome };
+      localStorage.setItem("tarefas", JSON.stringify(dadosSalvos));
+    }
+
+    function resetar() {
+      comodos.forEach(comodo => {
+        dadosSalvos[comodo] = { feito: false, nome: "" };
+      });
+      localStorage.setItem("tarefas", JSON.stringify(dadosSalvos));
+      location.reload();
+    }
+  </script>
+</body>
+</html>
